@@ -1,0 +1,17 @@
+header {
+    margin-bottom: 20px;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.signInWith {
+    text-align: end;
+}
+
+@media (max-width: 700px) {
+   .signInWith {
+    text-align: center;
+} 
+}
