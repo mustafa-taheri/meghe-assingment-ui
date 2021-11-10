@@ -4,6 +4,8 @@ import "./SignUp.css"
 import { UserOutlined } from '@ant-design/icons'
 import logo from '../../Assets/logo.jpeg'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { api_enpoint } from '../../config/env'
 
 const { Option } = Select
 const { Text } = Typography
@@ -22,7 +24,7 @@ const SignUp = props => {
         let _mobRex = new RegExp(/^[0-9\b]+$/)
         if (fullName.trim() === "") {
             message.error('Full Name cannot be blank ');
-           return _validate = false;
+            return _validate = false;
         }
         if (email.trim() === "") {
             message.error('Email Address cannot be blank ');
@@ -42,20 +44,46 @@ const SignUp = props => {
         }
         if (password.trim() === "") {
             message.error('Password cannot be blank');
-           return _validate = false;
+            return _validate = false;
         }
         return _validate
     }
     const handleRegistrationClick = () => {
         if (checkValidation()) {
             setdisplayLoading(true)
-            setTimeout(() => {
-                notification["success"]({
-                    message: "Registration Success",
-                });
-                setdisplayLoading(false)
-                props.history.push('/')
-            }, 5000)
+            axios({
+                method: 'POST',
+                url: api_enpoint.base_url + api_enpoint.register,
+                data: {
+                    fullname: fullName,
+                    mobile: mobile,
+                    gender: gender,
+                    email: email,
+                    password: password
+                }
+            })
+                .then(response => {
+                    if (response.status === 200 || 201) {
+                        setdisplayLoading(false)
+                        setEmail('')
+                        setFullName('')
+                        setGender('male')
+                        setMobile(undefined)
+                        setpassword('')
+                        notification['success']({
+                            message: "Registration Successful",
+                        });
+                        alert(JSON.stringify(response.data))
+                        props.history.push('/')
+
+                    }
+                })
+                .catch(error => {
+                    setdisplayLoading(false)
+                    notification['error']({
+                        message: error.response?.data ? error.response.data.message : "Unable Create",
+                    });
+                })
         }
     }
 
