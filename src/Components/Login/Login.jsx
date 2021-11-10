@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import './Login.css'
 import logo from '../../Assets/logo.jpeg'
 import { UserOutlined } from '@ant-design/icons'
+import { api_enpoint } from '../../config/env'
+import axios from 'axios'
 
 const { Text, Title } = Typography
 const Login = (props) => {
@@ -31,13 +33,31 @@ const Login = (props) => {
     const handleLoginClick = () => {
         if (checkValidation()) {
             setdisplayLoading(true)
-            setTimeout(() => {
-                notification["success"]({
-                    message: "Login Success",
-                });
-                setdisplayLoading(false)
-
-            }, 5000)
+            axios({
+                method: 'POST',
+                url: api_enpoint.base_url + api_enpoint.login,
+                data: {
+                    email: userName,
+                    password: password
+                }
+            })
+                .then(response => {
+                    if (response.status === 200 || 201) {
+                        setdisplayLoading(false)
+                        setuserName('')
+                        setpassword('')
+                        notification['success']({
+                            message: "Login Successfully",
+                        });
+                        alert(JSON.stringify(response.data))
+                    }
+                })
+                .catch(error => {
+                    setdisplayLoading(false)
+                    notification['error']({
+                        message: error.response && error.response.data ? error.response.data.message : "Unable Create",
+                    });
+                })
         }
     }
 
@@ -69,6 +89,7 @@ const Login = (props) => {
                     <Row style={{ marginBottom: 20 }}>
                         <Col xs={24} md={12}>
                             <Input
+                                value={userName}
                                 size='large'
                                 prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
                                 placeholder="Username / Email ID"
@@ -79,6 +100,7 @@ const Login = (props) => {
                     <Row style={{ marginBottom: 20 }}>
                         <Col xs={24} md={12}>
                             <Input.Password
+                                value={password}
                                 size='large'
                                 placeholder="Password"
                                 type="text"
